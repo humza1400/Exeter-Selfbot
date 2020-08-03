@@ -11,6 +11,7 @@ basically has everything you need for a selfbot plus more has a built in antinuk
 - antinuke
 - musicplayer
 - message logger
+- mee6 auto level up
 - nitro sniper
 - giveaway sniper
 - slotbot sniper
