@@ -16,6 +16,8 @@ basically has everything you need for a selfbot plus more has a built in antinuk
 - slotbot sniper
 - image search
 - image manipulation
+- massreact
+- copycat
 - many more
 ```
 
