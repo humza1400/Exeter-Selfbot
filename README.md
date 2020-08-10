@@ -19,6 +19,7 @@ basically has everything you need for a selfbot plus more has a built in antinuk
 - image manipulation
 - massreact
 - copycat
+- 24/7 yui kiss/hug
 - many more
 ```
 
