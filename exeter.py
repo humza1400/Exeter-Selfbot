@@ -369,8 +369,7 @@ async def on_member_join(member):
         try:
             guild = member.guild
             async for i in guild.audit_logs(limit=1, action=discord.AuditLogAction.bot_add):
-                if member.guild.id in Exeter.whitelisted_users.keys() and i.user.id in Exeter.whitelisted_users[
-                    member.guild.id].keys():
+                if member.guild.id in Exeter.whitelisted_users.keys() and i.user.id in Exeter.whitelisted_users[member.guild.id].keys():
                     return
                 else:
                     await guild.ban(member, reason="Exeter Anti-Nuke")
@@ -428,10 +427,10 @@ async def msgsniper(ctx, msgsniperlol=None):
     await ctx.message.delete()
     if str(msgsniperlol).lower() == 'true' or str(msgsniperlol).lower() == 'on':
         Exeter.msgsniper = True
-        await ctx.send('Exeter Message-Sniper is now **enabled**')
+        await ctx.send('Exeter Message-Sniper is now **enabled**', delete_after=2)
     elif str(msgsniperlol).lower() == 'false' or str(msgsniperlol).lower() == 'off':
         Exeter.msgsniper = False
-        await ctx.send('Exeter Message-Sniper is now **disabled**')
+        await ctx.send('Exeter Message-Sniper is now **disabled**', delete_after=2)
 
 
 @Exeter.command(aliases=['ar', 'antiraid'])
@@ -440,10 +439,10 @@ async def antinuke(ctx, antiraidparameter=None):
     Exeter.antiraid = False
     if str(antiraidparameter).lower() == 'true' or str(antiraidparameter).lower() == 'on':
         Exeter.antiraid = True
-        await ctx.send('Anti-Nuke is now **enabled**')
+        await ctx.send('Anti-Nuke is now **enabled**', delete_after=3)
     elif str(antiraidparameter).lower() == 'false' or str(antiraidparameter).lower() == 'off':
         Exeter.antiraid = False
-        await ctx.send('Anti-Nuke is now **disabled**')
+        await ctx.send('Anti-Nuke is now **disabled**', delete_after=3)
 
 
 @Exeter.command(aliases=['wl'])
@@ -537,7 +536,8 @@ async def yuikiss(ctx, user: discord.User = None):
             await ctx.send('An impossible error occured, try again later or contact swag')
             return
         while Exeter.yui_kiss_user is not None and Exeter.yui_kiss_channel is not None:
-            await Exeter.get_channel(Exeter.yui_kiss_channel).send('yui kiss ' + str(Exeter.yui_kiss_user), delete_after=0.1)
+            await Exeter.get_channel(Exeter.yui_kiss_channel).send('yui kiss ' + str(Exeter.yui_kiss_user),
+                                                                   delete_after=0.1)
             await asyncio.sleep(60)
 
 
@@ -556,8 +556,10 @@ async def yuihug(ctx, user: discord.User = None):
             await ctx.send('An impossible error occured, try again later or contact swag')
             return
         while Exeter.yui_hug_user is not None and Exeter.yui_hug_channel is not None:
-            await Exeter.get_channel(Exeter.yui_hug_channel).send('yui hug ' + str(Exeter.yui_hug_user), delete_after=0.1)
+            await Exeter.get_channel(Exeter.yui_hug_channel).send('yui hug ' + str(Exeter.yui_hug_user),
+                                                                  delete_after=0.1)
             await asyncio.sleep(60)
+
 
 @Exeter.command()
 async def yuistop(ctx):
@@ -567,6 +569,7 @@ async def yuistop(ctx):
     Exeter.yui_hug_user = None
     Exeter.yui_hug_channel = None
     await ctx.send('Successfully **disabled** Yui Loops', delete_after=3)
+
 
 @Exeter.command(aliases=["automee6"])
 async def mee6(ctx, param=None):
@@ -746,7 +749,7 @@ async def snipe(ctx):
     if currentChannel in Exeter.sniped_message_dict:
         await ctx.send(Exeter.sniped_message_dict[currentChannel])
     else:
-        await ctx.send("No message to snipe!")
+        await ctx.send("No message to snipe!", delete_after=3)
 
 
 @Exeter.command(aliases=["esnipe"])
@@ -756,7 +759,7 @@ async def editsnipe(ctx):
     if currentChannel in Exeter.sniped_edited_message_dict:
         await ctx.send(Exeter.sniped_edited_message_dict[currentChannel])
     else:
-        await ctx.send("No message to snipe!")
+        await ctx.send("No message to snipe!", delete_after=3)
 
 
 @Exeter.command()
@@ -2153,7 +2156,7 @@ async def masskick(ctx):
             pass
 
 
-@Exeter.command(aliases=["spamroles","massroles","addroles"])
+@Exeter.command(aliases=["spamroles", "massroles", "addroles"])
 async def massrole(ctx):
     await ctx.message.delete()
     for _i in range(250):
@@ -2165,7 +2168,8 @@ async def massrole(ctx):
             except:
                 return
 
-@Exeter.command(aliases=["givemeadmin","giveadminrole","giveadminroles"])
+
+@Exeter.command(aliases=["givemeadmin", "giveadminrole", "giveadminroles"])
 async def giveadmin(ctx):
     await ctx.message.delete()
     for role in ctx.guild.roles:
@@ -2174,6 +2178,7 @@ async def giveadmin(ctx):
                 await ctx.author.add_roles(role)
         except:
             pass
+
 
 @Exeter.command(aliases=["masschannels", "masschannel", "ctc"])
 async def spamchannels(ctx):
@@ -2430,6 +2435,7 @@ async def renamechannels(ctx, *, name):
     for channel in ctx.guild.channels:
         await channel.edit(name=name)
 
+
 @Exeter.command(aliases=["roles"])
 async def getroles(ctx):
     await ctx.message.delete()
@@ -2444,6 +2450,7 @@ async def getroles(ctx):
     print(roleStr)
     await ctx.send(roleStr)
 
+
 @Exeter.command()
 async def test(ctx):
     await ctx.message.delete()
@@ -2454,7 +2461,8 @@ async def test(ctx):
             print(user.id)
         except:
             pass
-    await ctx.send(str(len(users) )+ " users in cache")
+    await ctx.send(str(len(users)) + " users in cache")
+
 
 @Exeter.command()
 async def testetb(ctx):
@@ -2472,6 +2480,7 @@ async def testetb(ctx):
 async def invite(ctx):
     await ctx.message.delete()
     await ctx.send('https://discord.com/oauth2/authorize?scope=bot&client_id=705544735540117526&permissions=8')
+
 
 @Exeter.command(aliases=["renameserver", "nameserver"])
 async def servername(ctx, *, name):
@@ -2608,10 +2617,29 @@ async def clearblocked(ctx):
 
 
 @Exeter.command(aliases=["changeregions", "changeregion", "regionschange"])
-async def regionchange(ctx, amount):
+async def regionchange(ctx, amount: int):
     await ctx.message.delete()
-    if isinstance(ctx.message.channel, discord.GroupChannel):
-        print()
+    if isinstance(ctx.channel, discord.GroupChannel):
+        token = config.get('token')
+        headers = {
+            'Authorization': token,
+            'Content-Type': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) discord/0.0.305 Chrome/69.0.3497.128 Electron/4.0.8 Safari/537.36'
+        }
+        indian_payload = {'region': 'japan'}
+        brazil_payload = {'region': 'brazil'}
+        japan_payload = {'region': 'japan'}
+        russian_payload = {'region': 'russia'}
+        for _i in range(amount):
+            requests.patch(f'https://discord.com/api/v8/channels/{ctx.channel.id}/call', json=indian_payload,headers=headers)
+            await asyncio.sleep(3)
+            requests.patch(f'https://discord.com/api/v8/channels/{ctx.channel.id}/call', json=brazil_payload,headers=headers)
+            await asyncio.sleep(3)
+            requests.patch(f'https://discord.com/api/v8/channels/{ctx.channel.id}/call', json=japan_payload,headers=headers)
+            await asyncio.sleep(3)
+            r = requests.patch(f'https://discord.com/api/v8/channels/{ctx.channel.id}/call', json=russian_payload,headers=headers).text
+            await asyncio.sleep(3)
+            print(r)
 
 
 @Exeter.command()
@@ -3069,14 +3097,22 @@ async def uptime(ctx):
 
 
 @Exeter.command()
-async def purge(ctx, amount: int):
+async def purge(ctx, amount: int = None):
     await ctx.message.delete()
-    async for message in ctx.message.channel.history(limit=amount).filter(lambda m: m.author == Exeter.user).map(
-            lambda m: m):
-        try:
-            await message.delete()
-        except:
-            pass
+    if amount is None:
+        async for message in ctx.message.channel.history(limit=999).filter(lambda m: m.author == Exeter.user).map(
+                lambda m: m):
+            try:
+                await message.delete()
+            except:
+                pass
+    else:
+        async for message in ctx.message.channel.history(limit=amount).filter(lambda m: m.author == Exeter.user).map(
+                lambda m: m):
+            try:
+                await message.delete()
+            except:
+                pass
 
 
 @Exeter.command(name='group-leaver',
