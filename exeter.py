@@ -205,6 +205,7 @@ Exeter.yui_kiss_user = None
 Exeter.yui_kiss_channel = None
 Exeter.yui_hug_user = None
 Exeter.yui_hug_channel = None
+Exeter.snipe_history_dict = {}
 Exeter.sniped_message_dict = {}
 Exeter.sniped_edited_message_dict = {}
 Exeter.whitelisted_users = {}
@@ -664,7 +665,8 @@ async def on_message_delete(message):
     if message.author.id == Exeter.user.id:
         return
     if Exeter.msgsniper:
-        if isinstance(message.channel, discord.DMChannel) or isinstance(message.channel, discord.GroupChannel):
+        # if isinstance(message.channel, discord.DMChannel) or isinstance(message.channel, discord.GroupChannel): \\ removed so people cant get you disabled
+        if isinstance(message.channel, discord.DMChannel):
             attachments = message.attachments
             if len(attachments) == 0:
                 message_content = "`" + str(discord.utils.escape_markdown(str(message.author))) + "`: " + str(
@@ -680,20 +682,26 @@ async def on_message_delete(message):
                 await message.channel.send(message_content)
     if len(Exeter.sniped_message_dict) > 1000:
         Exeter.sniped_message_dict.clear()
+    if len(Exeter.snipe_history_dict) > 1000:
+        Exeter.snipe_history_dict.clear()
     attachments = message.attachments
     if len(attachments) == 0:
         channel_id = message.channel.id
-        message_content = "`" + str(discord.utils.escape_markdown(str(message.author))) + "`: " + str(
-            message.content).replace("@everyone", "@\u200beveryone").replace("@here", "@\u200bhere")
+        message_content = "`" + str(discord.utils.escape_markdown(str(message.author))) + "`: " + str(message.content).replace("@everyone", "@\u200beveryone").replace("@here", "@\u200bhere")
         Exeter.sniped_message_dict.update({channel_id: message_content})
+        if channel_id in Exeter.snipe_history_dict:
+            pre = Exeter.snipe_history_dict[channel_id]
+            post = str(message.author) + ": " + str(message.content).replace("@everyone", "@\u200beveryone").replace("@here", "@\u200bhere")
+            Exeter.snipe_history_dict.update({channel_id: pre[:-3] + post + "\n```"})
+        else:
+            post = str(message.author) + ": " + str(message.content).replace("@everyone", "@\u200beveryone").replace("@here", "@\u200bhere")
+            Exeter.snipe_history_dict.update({channel_id: "```\n" + post + "\n```"})
     else:
         links = ""
         for attachment in attachments:
             links += attachment.proxy_url + "\n"
         channel_id = message.channel.id
-        message_content = "`" + str(
-            discord.utils.escape_markdown(str(message.author))) + "`: " + discord.utils.escape_mentions(
-            message.content) + "\n\n**Attachments:**\n" + links
+        message_content = "`" + str(discord.utils.escape_markdown(str(message.author))) + "`: " + discord.utils.escape_mentions(message.content) + "\n\n**Attachments:**\n" + links
         Exeter.sniped_message_dict.update({channel_id: message_content})
 
 
@@ -704,7 +712,8 @@ async def on_message_edit(before, after):
     if Exeter.msgsniper:
         if before.content is after.content:
             return
-        if isinstance(before.channel, discord.DMChannel) or isinstance(before.channel, discord.GroupChannel):
+        # if isinstance(before.channel, discord.DMChannel) or isinstance(before.channel, discord.GroupChannel): \\ removed so people cant get you disabled
+        if isinstance(before.channel, discord.DMChannel):
             attachments = before.attachments
             if len(attachments) == 0:
                 message_content = "`" + str(
@@ -742,6 +751,23 @@ async def on_message_edit(before, after):
         Exeter.sniped_edited_message_dict.update({channel_id: message_content})
 
 
+@Exeter.command(aliases=["clearhistory"])
+async def clearsnipehistory(ctx):
+    await ctx.message.delete()
+    del Exeter.snipe_history_dict[ctx.channel.id]
+    await ctx.send("Cleared Snipe History of " + ctx.channel.name, delete_after=3)
+
+@Exeter.command(aliases=["history"])
+async def snipehistory(ctx):
+    await ctx.message.delete()
+    currentChannel = ctx.channel.id
+    if currentChannel in Exeter.snipe_history_dict:
+        try:
+            await ctx.send(Exeter.snipe_history_dict[currentChannel])
+        except:
+            del Exeter.snipe_history_dict[currentChannel]
+    else:
+        await ctx.send("Snipe History is empty!", delete_after=3)
 @Exeter.command()
 async def snipe(ctx):
     await ctx.message.delete()
@@ -829,7 +855,7 @@ async def help(ctx, category=None):
     elif str(category).lower() == "text":
         embed = discord.Embed(color=random.randrange(0x1000000), timestamp=ctx.message.created_at)
         embed.set_image(url="https://cdn.discordapp.com/attachments/723250694118965300/723278609648713818/image0.gif")
-        embed.description = f"\uD83D\uDCB0 `TEXT COMMANDS`\n`> exeter` - sends the exeter logo\n`> snipe` - shows the last deleted message\n`> editsnipe` - shows the last edited message\n`> msgsniper <on/off> ({Exeter.msgsniper})` - enables a message sniper for deleted messages in DMs\n`> clear` - sends a large message filled with invisible unicode\n`> del <message>` - sends a message and deletes it instantly\n`> 1337speak <message>` - talk like a hacker\n`> minesweeper` - play a game of minesweeper\n`> spam <amount>` - spams a message\n`> dm <user> <content>` - dms a user a message\n`> reverse <message>` - sends the message but in reverse-order\n`> shrug` - returns ¯\_(ツ)_/¯\n`> lenny` - returns ( ͡° ͜ʖ ͡°)\n`> fliptable` - returns (╯°□°）╯︵ ┻━┻\n`> unflip` - returns (╯°□°）╯︵ ┻━┻\n`> bold <message>` - bolds the message\n`> censor <message>` - censors the message\n`> underline <message>` - underlines the message\n`> italicize <message>` - italicizes the message\n`> strike <message>` - strikethroughs the message\n`> quote <message>` - quotes the message\n`> code <message>` - applies code formatting to the message\n`> purge <amount>` - purges the amount of messages\n`> empty` - sends an empty message\n`> tts <content>` - returns an mp4 file of your content\n`> firstmsg` - shows the first message in the channel history\n`> ascii <message>` - creates an ASCII art of your message\n`> wizz` - makes a prank message about wizzing \n`> 8ball <question>` - returns an 8ball answer\n`> slots` - play the slot machine\n`> everyone` - pings everyone through a link\n`> abc` - cyles through the alphabet\n`> 100` - cycles -100\n`> cum` - makes you cum lol?\n`> 9/11` - sends a 9/11 attack\n`> massreact <emoji>` - mass reacts with the specified emoji"
+        embed.description = f"\uD83D\uDCB0 `TEXT COMMANDS`\n`> exeter` - sends the exeter logo\n`> snipehistory` - shows a history of deleted messages\n`> clearsnipehistory` - clears snipe history of current channel\n`> snipe` - shows the last deleted message\n`> editsnipe` - shows the last edited message\n`> msgsniper <on/off> ({Exeter.msgsniper})` - enables a message sniper for deleted messages in DMs\n`> clear` - sends a large message filled with invisible unicode\n`> del <message>` - sends a message and deletes it instantly\n`> 1337speak <message>` - talk like a hacker\n`> minesweeper` - play a game of minesweeper\n`> spam <amount>` - spams a message\n`> dm <user> <content>` - dms a user a message\n`> reverse <message>` - sends the message but in reverse-order\n`> shrug` - returns ¯\_(ツ)_/¯\n`> lenny` - returns ( ͡° ͜ʖ ͡°)\n`> fliptable` - returns (╯°□°）╯︵ ┻━┻\n`> unflip` - returns (╯°□°）╯︵ ┻━┻\n`> bold <message>` - bolds the message\n`> censor <message>` - censors the message\n`> underline <message>` - underlines the message\n`> italicize <message>` - italicizes the message\n`> strike <message>` - strikethroughs the message\n`> quote <message>` - quotes the message\n`> code <message>` - applies code formatting to the message\n`> purge <amount>` - purges the amount of messages\n`> empty` - sends an empty message\n`> tts <content>` - returns an mp4 file of your content\n`> firstmsg` - shows the first message in the channel history\n`> ascii <message>` - creates an ASCII art of your message\n`> wizz` - makes a prank message about wizzing \n`> 8ball <question>` - returns an 8ball answer\n`> slots` - play the slot machine\n`> everyone` - pings everyone through a link\n`> abc` - cyles through the alphabet\n`> 100` - cycles -100\n`> cum` - makes you cum lol?\n`> 9/11` - sends a 9/11 attack\n`> massreact <emoji>` - mass reacts with the specified emoji"
         await ctx.send(embed=embed)
     elif str(category).lower() == "music":
         embed = discord.Embed(color=random.randrange(0x1000000), timestamp=ctx.message.created_at)
